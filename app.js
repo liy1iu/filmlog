@@ -1,10 +1,16 @@
 const STORAGE_KEY = 'filmLogUsuarios';
+const GENEROS = ['drama', 'ficção científica', 'suspense', 'animação', 'ação', 'romance', 'terror'];
 
 // bolinhas no canvas de fundo
 const canvas = document.getElementById('bg');
 const ctx = canvas.getContext('2d');
 let dots = [];
 const pointer = { x: -9999, y: -9999, active: false };
+const modalOverlay = document.getElementById('modalOverlay');
+const formEdicao = document.getElementById('formEdicao');
+const feedbackEdicao = document.getElementById('feedbackEdicao');
+const confirmarOverlay = document.getElementById('confirmarOverlay');
+let indicePendenteExclusao = null;
 
 function resizeCanvas() {
   const ratio = window.devicePixelRatio || 1;
@@ -174,15 +180,17 @@ function renderTabela() {
   lista.forEach((usuario, i) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${usuario.nome}</td>
-      <td>${usuario.email}</td>
-      <td>${usuario.cpf}</td>
-      <td>${usuario.idade}</td>
-      <td>${usuario.filme}</td>
-      <td>${usuario.genero}</td>
-      <td>
-        <button class="btn-editar" onclick="editarUsuario(${i})">editar</button>
-        <button class="btn-excluir" onclick="excluirUsuario(${i})">excluir</button>
+      <td data-label="nome">${usuario.nome}</td>
+      <td data-label="e-mail">${usuario.email}</td>
+      <td data-label="cpf">${usuario.cpf}</td>
+      <td data-label="idade">${usuario.idade}</td>
+      <td data-label="filme">${usuario.filme}</td>
+      <td data-label="gênero">${usuario.genero}</td>
+      <td data-label="ações">
+        <div class="acoes-linha">
+          <button class="btn-editar" type="button" onclick="editarUsuario(${i})">editar</button>
+          <button class="btn-excluir" type="button" onclick="excluirUsuario(${i})">excluir</button>
+        </div>
       </td>`;
     corpo.appendChild(tr);
   });
@@ -190,37 +198,107 @@ function renderTabela() {
 
 function excluirUsuario(i) {
   const lista = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-  lista.splice(i, 1);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
-  renderTabela();
+  const usuario = lista[i];
+  indicePendenteExclusao = i;
+  document.getElementById('textoConfirmacao').textContent = `você quer mesmo excluir o perfil de ${usuario.nome}?`;
+  confirmarOverlay.hidden = false;
+  document.body.style.overflow = 'hidden';
 }
 
 function editarUsuario(i) {
   const lista = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
   const usuario = lista[i];
+  document.getElementById('editIndice').value = i;
+  document.getElementById('editNome').value = usuario.nome;
+  document.getElementById('editEmail').value = usuario.email;
+  document.getElementById('editIdade').value = usuario.idade;
+  document.getElementById('editFilme').value = usuario.filme;
+  document.getElementById('editGenero').value = GENEROS.includes(usuario.genero) ? usuario.genero : '';
+  feedbackEdicao.textContent = '';
+  feedbackEdicao.className = 'feedback';
+  modalOverlay.hidden = false;
+  document.body.style.overflow = 'hidden';
+  document.getElementById('editNome').focus();
+}
 
-  const novoNome = prompt('nome:', usuario.nome);
-  if (novoNome === null) return;
+function fecharModal() {
+  modalOverlay.hidden = true;
+  formEdicao.reset();
+  feedbackEdicao.textContent = '';
+  feedbackEdicao.className = 'feedback';
+  atualizarScrollBody();
+}
 
-  const novoEmail = prompt('e-mail:', usuario.email);
-  if (novoEmail === null) return;
+function fecharConfirmacao() {
+  confirmarOverlay.hidden = true;
+  indicePendenteExclusao = null;
+  atualizarScrollBody();
+}
 
-  const novaIdade = prompt('idade:', usuario.idade);
-  if (novaIdade === null) return;
+function atualizarScrollBody() {
+  document.body.style.overflow = modalOverlay.hidden && confirmarOverlay.hidden ? '' : 'hidden';
+}
 
-  const novoFilme = prompt('filme marcante:', usuario.filme);
-  if (novoFilme === null) return;
+document.getElementById('fecharModal').addEventListener('click', fecharModal);
+document.getElementById('cancelarEdicao').addEventListener('click', fecharModal);
+document.getElementById('fecharConfirmacao').addEventListener('click', fecharConfirmacao);
+document.getElementById('cancelarConfirmacao').addEventListener('click', fecharConfirmacao);
+document.getElementById('confirmarExclusao').addEventListener('click', () => {
+  if (indicePendenteExclusao === null) return;
+  const lista = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  lista.splice(indicePendenteExclusao, 1);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
+  fecharConfirmacao();
+  renderTabela();
+});
 
-  lista[i] = {
-    ...usuario,
-    nome: novoNome.trim() || usuario.nome,
-    email: novoEmail.trim() || usuario.email,
-    idade: Number(novaIdade) || usuario.idade,
-    filme: novoFilme.trim() || usuario.filme
-  };
+modalOverlay.addEventListener('click', event => {
+  if (event.target === modalOverlay) {
+    fecharModal();
+  }
+});
+
+confirmarOverlay.addEventListener('click', event => {
+  if (event.target === confirmarOverlay) {
+    fecharConfirmacao();
+  }
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key !== 'Escape') return;
+  if (!modalOverlay.hidden) fecharModal();
+  if (!confirmarOverlay.hidden) fecharConfirmacao();
+});
+
+formEdicao.addEventListener('submit', event => {
+  event.preventDefault();
+
+  const indice = Number(document.getElementById('editIndice').value);
+  const nome = document.getElementById('editNome').value.trim();
+  const email = document.getElementById('editEmail').value.trim();
+  const idade = Number(document.getElementById('editIdade').value);
+  const filme = document.getElementById('editFilme').value.trim();
+  const genero = document.getElementById('editGenero').value;
+
+  const invalido =
+    nome.length < 3 ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+    !(idade >= 1 && idade <= 120) ||
+    filme.length < 2 ||
+    !genero;
+
+  if (invalido) {
+    feedbackEdicao.textContent = 'confere os campos antes de salvar as mudanças';
+    feedbackEdicao.className = 'feedback erro-feedback';
+    return;
+  }
+
+  const lista = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  lista[indice] = { ...lista[indice], nome, email, idade, filme, genero };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
   renderTabela();
-}
+  fecharModal();
+});
 
 document.getElementById('btnLimpar').addEventListener('click', () => {
   if (confirm('apagar todos os perfis cadastrados?')) {
