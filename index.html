@@ -115,6 +115,76 @@
       <p id="semUsuarios" class="vazio">nenhum perfil cadastrado ainda.</p>
     </section>
 
+    <div id="modalOverlay" class="modal-overlay" hidden>
+      <section class="modal-card" aria-labelledby="modalTitulo" aria-modal="true" role="dialog">
+        <div class="modal-topo">
+          <div>
+            <p class="modal-eyebrow">editar perfil</p>
+            <h3 id="modalTitulo">ajustar informações</h3>
+          </div>
+          <button type="button" id="fecharModal" class="btn-fechar" aria-label="fechar">×</button>
+        </div>
+
+        <form id="formEdicao" novalidate>
+          <input type="hidden" id="editIndice" />
+          <div class="campo">
+            <label for="editNome">nome</label>
+            <input type="text" id="editNome" placeholder="nome completo" />
+          </div>
+          <div class="campo">
+            <label for="editEmail">e-mail</label>
+            <input type="email" id="editEmail" placeholder="email@exemplo.com" />
+          </div>
+          <div class="duas-colunas">
+            <div class="campo">
+              <label for="editIdade">idade</label>
+              <input type="number" id="editIdade" min="1" max="120" placeholder="ex: 20" />
+            </div>
+            <div class="campo">
+              <label for="editGenero">gênero favorito</label>
+              <select id="editGenero">
+                <option value="">selecione...</option>
+                <option>drama</option>
+                <option>ficção científica</option>
+                <option>suspense</option>
+                <option>animação</option>
+                <option>ação</option>
+                <option>romance</option>
+                <option>terror</option>
+              </select>
+            </div>
+          </div>
+          <div class="campo">
+            <label for="editFilme">filme marcante</label>
+            <input type="text" id="editFilme" placeholder="ex: interestelar" />
+          </div>
+          <p id="feedbackEdicao" class="feedback"></p>
+          <div class="acoes-modal">
+            <button type="button" id="cancelarEdicao" class="btn-secundario">cancelar</button>
+            <button type="submit">salvar mudanças</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div id="confirmarOverlay" class="modal-overlay" hidden>
+      <section class="modal-card modal-card-menor" aria-labelledby="confirmarTitulo" aria-modal="true" role="dialog">
+        <div class="modal-topo">
+          <div>
+            <p class="modal-eyebrow">confirmar exclusão</p>
+            <h3 id="confirmarTitulo">tem certeza?</h3>
+          </div>
+          <button type="button" id="fecharConfirmacao" class="btn-fechar" aria-label="fechar">×</button>
+        </div>
+
+        <p id="textoConfirmacao" class="intro modal-texto"></p>
+        <div class="acoes-modal">
+          <button type="button" id="cancelarConfirmacao" class="btn-secundario">cancelar</button>
+          <button type="button" id="confirmarExclusao" class="btn-excluir-forte">excluir perfil</button>
+        </div>
+      </section>
+    </div>
+
     <!-- tela 3: cep -->
     <section id="cep" class="tela">
       <h2>consulta de cep</h2>
