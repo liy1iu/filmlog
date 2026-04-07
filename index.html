@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>filmlog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <canvas id="bg"></canvas>
+
+  <nav>
+    <div class="logo">
+      <svg class="logo-icon" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="1.5" y="5.5" width="23" height="15" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="1.5" y="9" width="3.5" height="2.5" fill="currentColor"/>
+        <rect x="1.5" y="14.5" width="3.5" height="2.5" fill="currentColor"/>
+        <rect x="21" y="9" width="3.5" height="2.5" fill="currentColor"/>
+        <rect x="21" y="14.5" width="3.5" height="2.5" fill="currentColor"/>
+        <line x1="8" y1="5.5" x2="8" y2="20.5" stroke="currentColor" stroke-width="0.8" stroke-opacity="0.35"/>
+        <line x1="13" y1="5.5" x2="13" y2="20.5" stroke="currentColor" stroke-width="0.8" stroke-opacity="0.35"/>
+        <line x1="18" y1="5.5" x2="18" y2="20.5" stroke="currentColor" stroke-width="0.8" stroke-opacity="0.35"/>
+      </svg>
+      <span>filmlog</span>
+    </div>
+    <ul>
+      <li><a href="#" class="nav-link active" data-tela="cadastro">cadastro</a></li>
+      <li><a href="#" class="nav-link" data-tela="lista">perfis</a></li>
+      <li><a href="#" class="nav-link" data-tela="cep">cep</a></li>
+      <li><a href="#" class="nav-link" data-tela="sobre">sobre</a></li>
+    </ul>
+  </nav>
+
+  <main>
+
+    <!-- tela 1: cadastro -->
+    <section id="cadastro" class="tela ativa">
+      <h2>seu perfil cinéfilo</h2>
+      <p class="intro">
+        preencha seus dados e adicione um filme que marcou a sua experiência com cinema.
+      </p>
+      <form id="formCadastro" novalidate>
+        <div class="campo">
+          <label for="nome">nome</label>
+          <input type="text" id="nome" placeholder="nome completo" />
+          <span class="erro" id="erroNome"></span>
+        </div>
+        <div class="campo">
+          <label for="email">e-mail</label>
+          <input type="email" id="email" placeholder="email@exemplo.com" />
+          <span class="erro" id="erroEmail"></span>
+        </div>
+        <div class="campo">
+          <label for="cpf">cpf</label>
+          <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14" />
+          <span class="erro" id="erroCpf"></span>
+        </div>
+        <div class="campo">
+          <label for="idade">idade</label>
+          <input type="number" id="idade" placeholder="ex: 20" min="1" max="120" />
+          <span class="erro" id="erroIdade"></span>
+        </div>
+        <div class="duas-colunas">
+          <div class="campo">
+            <label for="filme">filme marcante</label>
+            <input type="text" id="filme" placeholder="ex: interestelar" />
+            <span class="erro" id="erroFilme"></span>
+          </div>
+          <div class="campo">
+            <label for="genero">gênero favorito</label>
+            <select id="genero">
+              <option value="">selecione...</option>
+              <option>drama</option>
+              <option>ficção científica</option>
+              <option>suspense</option>
+              <option>animação</option>
+              <option>ação</option>
+              <option>romance</option>
+              <option>terror</option>
+            </select>
+            <span class="erro" id="erroGenero"></span>
+          </div>
+        </div>
+        <button type="submit">salvar perfil</button>
+        <p id="feedbackCadastro" class="feedback"></p>
+      </form>
+    </section>
+
+    <!-- tela 2: lista -->
+    <section id="lista" class="tela">
+      <h2>perfis cadastrados</h2>
+      <p class="intro">
+        aqui ficam os perfis salvos. se quiser, você pode editar as informações ou remover um cadastro.
+      </p>
+      <button id="btnLimpar" class="btn-danger">apagar todos</button>
+      <div class="tabela-wrap">
+        <table id="tabela">
+          <thead>
+            <tr>
+              <th>nome</th>
+              <th>e-mail</th>
+              <th>cpf</th>
+              <th>idade</th>
+              <th>filme</th>
+              <th>gênero</th>
+              <th>ações</th>
+            </tr>
+          </thead>
+          <tbody id="corpoTabela"></tbody>
+        </table>
+      </div>
+      <p id="semUsuarios" class="vazio">nenhum perfil cadastrado ainda.</p>
+    </section>
+
+    <!-- tela 3: cep -->
+    <section id="cep" class="tela">
+      <h2>consulta de cep</h2>
+      <p class="intro">
+        digita o cep.
+      </p>
+      <div class="campo">
+        <label for="inputCep">cep</label>
+        <input type="text" id="inputCep" placeholder="00000-000" maxlength="9" />
+        <span class="erro" id="erroCep"></span>
+      </div>
+      <div class="grid-cep">
+        <div class="campo"><label>rua</label><input id="rua" readonly /></div>
+        <div class="campo"><label>bairro</label><input id="bairro" readonly /></div>
+        <div class="campo"><label>cidade</label><input id="cidade" readonly /></div>
+        <div class="campo"><label>estado</label><input id="estado" readonly /></div>
+      </div>
+    </section>
+
+    <!-- tela 4: sobre -->
+    <section id="sobre" class="tela">
+      <h2>sobre o projeto</h2>
+      <div class="card">
+        <h3>objetivo</h3>
+        <p>
+          o filmlog oferece um espaço para a própria pessoa montar seu perfil e registrar sua ligação com filmes de forma simples.
+        </p>
+      </div>
+      <div class="card">
+        <h3>o que foi usado</h3>
+        <ul class="lista-explicacao">
+          <li><strong>html semântico</strong>: uso de <code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;section&gt;</code>, <code>&lt;form&gt;</code> e <code>&lt;table&gt;</code> para organizar a interface.</li>
+          <li><strong>box model</strong>: espaçamentos, bordas e respiro visual aplicados para separar blocos e melhorar a leitura.</li>
+          <li><strong>flexbox</strong>: distribuição da navegação, formulário e cards com alinhamento consistente.</li>
+          <li><strong>grid</strong>: estrutura de campos em colunas e organização da área de consulta de cep.</li>
+          <li><strong>media queries</strong>: adaptação das telas para celular e resoluções menores.</li>
+          <li><strong>javascript</strong>: validações em tempo real, navegação entre telas, renderização da tabela e edição dos dados.</li>
+          <li><strong>localstorage</strong>: persistência dos perfis cadastrados diretamente no navegador.</li>
+          <li><strong>fetch api</strong>: consulta ao viacep com preenchimento automático do endereço.</li>
+          <li><strong>canvas</strong>: fundo animado com partículas interativas para enriquecer a identidade visual.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>checklist do trabalho</h3>
+        <ul class="lista-explicacao">
+          <li>quatro telas acessadas por navegação.</li>
+          <li>cadastro com nome, e-mail, cpf e idade.</li>
+          <li>validação em tempo real e feedback visual.</li>
+          <li>lista responsiva com editar, excluir e apagar tudo.</li>
+          <li>consulta de cep com requisição externa via fetch.</li>
+          <li>explicação dos conceitos de html, css, javascript, fetch api e localstorage.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>integrantes</h3>
+        <ul class="lista-explicacao">
+          <li>arthur</li>
+          <li>danilo</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
