@@ -89,6 +89,28 @@ window.addEventListener('mouseleave', () => {
   pointer.active = false;
 });
 
+function validarCPF(cpf) {
+  const numeros = cpf.replace(/\D/g, '');
+  if (numeros.length !== 11) return false;
+  if (/^(\d)\1{10}$/.test(numeros)) return false;
+
+  let soma = 0;
+  for (let i = 0; i < 9; i += 1) {
+    soma += Number(numeros[i]) * (10 - i);
+  }
+  let digito1 = (soma * 10) % 11;
+  if (digito1 === 10) digito1 = 0;
+  if (digito1 !== Number(numeros[9])) return false;
+
+  soma = 0;
+  for (let i = 0; i < 10; i += 1) {
+    soma += Number(numeros[i]) * (11 - i);
+  }
+  let digito2 = (soma * 10) % 11;
+  if (digito2 === 10) digito2 = 0;
+  return digito2 === Number(numeros[10]);
+}
+
 // navegação entre telas
 document.querySelectorAll('.nav-link').forEach(link => {
   link.addEventListener('click', e => {
@@ -126,7 +148,10 @@ function liveVal(id, erroId, fn) {
 
 liveVal('nome',  'erroNome',  v => v.trim().length < 3 ? 'mínimo 3 caracteres' : '');
 liveVal('email', 'erroEmail', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? '' : 'e-mail inválido');
-liveVal('cpf',   'erroCpf',   v => /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(v) ? '' : 'formato: 000.000.000-00');
+liveVal('cpf', 'erroCpf', v => {
+  if (!/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(v)) return 'formato: 000.000.000-00';
+  return validarCPF(v) ? '' : 'cpf inválido';
+});
 liveVal('idade', 'erroIdade', v => v >= 1 && v <= 120 ? '' : 'idade entre 1 e 120');
 liveVal('filme', 'erroFilme', v => v.trim().length < 2 ? 'informe um filme' : '');
 liveVal('genero', 'erroGenero', v => v ? '' : 'selecione um gênero');
@@ -146,7 +171,7 @@ document.getElementById('formCadastro').addEventListener('submit', e => {
   const invalido =
     nome.length < 3 ||
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
-    !/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf) ||
+    !validarCPF(cpf) ||
     !(idade >= 1 && idade <= 120) ||
     filme.length < 2 ||
     !genero;
